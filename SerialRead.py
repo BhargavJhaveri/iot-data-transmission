@@ -42,7 +42,7 @@ def calChecksum():
             a = readByte()
             message.append(a)
             pa_size = pa_size - 1
-    data = message.pack("%dB" % len(data), *message)
+    message = message.pack("%dB" % len(message), *message)
     for i in range(0,len(message), 2):
         word = ord(message[i]) + (ord(message[i+1]) << 8)
         sum_words = carry_around_add(sum_words,word)
@@ -63,23 +63,28 @@ def detectError():
         return 1
     else:
         return 0
-    
+
+
+ser_port.write(chr(65))
 while True:
+    a = readByte()
+    if not a:
+        continue
+    print "New character is seen with length : "+ " "+ a +" " + str(len(a))
+
     first_byte = bytearray()
-    first_byte.extend(readByte())
+    first_byte.extend(a)
 
-
-
-    print first_byte
     if first_packet == 0:
         pa_size = ord(first_byte) & size_mask
+        print "\nPacket size is :" + str(pa_size)
 
         if pa_size == 1:
             last_packet = 1
             f.close()
         else:
             print "Checking checksum"
-    """
+    
             if detectError() == 1:
  	        #sendNACK()
                 print "send NACK"
@@ -87,26 +92,23 @@ while True:
                 #sendACK()
                 print "send ACK"
                 f.write(message)
-    """              
+                 
                                  
     if first_packet == 1:
         pa_size = ord(first_byte) & size_mask
+        print "First Packet size is :" + str(pa_size)
         if pa_size == 1:
             last_packet = 1
             f.close()
         else:
 	    while pa_size > 1:
-                first_oct = bytearray()
-	        first_oct.extend(readByte())
-                second_oct = bytearray()
-	        second_oct.extend(readByte())
-                third_oct = bytearray()
-	        third_oct.extend(readByte())
-                fourth_oct = bytearray()
-	        fourth_oct.extend(readByte())
+                first_oct = ord(readByte())
+                second_oct = ord(readByte())
+                third_oct = ord(readByte())
+                fourth_oct = ord(readByte())
                 serverIP = str(first_oct)+'.'+str(second_oct)+'.'+str(third_oct)+'.'+str(fourth_oct)
+                print "ServerIP is : " + serverIP
             	pa_size = pa_size - 4
  			
 	    first_packet = 0
         
-	
