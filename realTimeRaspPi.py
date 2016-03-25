@@ -33,7 +33,10 @@ def TCPConn_inits():
 def sendPacket(char):
     charBin = string_to_bits(char)
     for i in range(8):
-        GPIO.output(7, charBin[i])
+	if i == 0:
+	     GPIO.output(7, 1)
+        else:
+	     GPIO.output(7, charBin[i])
         time.sleep(sleep)
 
 def string_to_bits(string_data):
@@ -41,12 +44,11 @@ def string_to_bits(string_data):
 
 
 sleep = 1/100.0000
-preambleTime =
 
 TCP_IP = ''
 TCP_PORT_PC1 = 5005
 TCP_PORT_PC2 = 5006
-BUFFER_SIZE = 20
+BUFFER_SIZE = 1
 
 
 
@@ -57,7 +59,8 @@ while 1: #we need to finalize the protocol
     dataToTransmit = PC1.recv(BUFFER_SIZE)
     sendPacket(dataToTransmit)
     ack = PC2.recv(BUFFER_SIZE) #pc2 will return the data that it received
-    if(ack != dataToTransmit)
+    while ack != dataToTransmit:
+	sendPacket(dataToTransmit)
 
 
 
