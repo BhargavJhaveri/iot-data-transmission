@@ -10,15 +10,15 @@ pa_size = 1
 message = 'A'
 
 def carry_around_add(a,b):
-    c = a+b
-    return (c & 0xffff) + (c >> 16)
+    carry = a+b
+    return (carry & 0xffff) + (carry >> 16)
 
 def calChecksum():
     global ser_port
     global pa_size
     global message
-    s = 0
-    w = 0
+    sum_words = 0
+    word = 0
     """ Forming bytearray of payload by removing first 3 bytes
     1 sync/size byte and 2 checksum bytes"""
     message = bytearray(ser_port.read())
@@ -34,9 +34,9 @@ def calChecksum():
             pa_size = pa_size - 1
 
     for i in range(0,len(message), 2):
-        w = ord(message[i]) + (ord(message[i+1]) << 8)
-        s = carry_around_add(s,w)
-    return ~s & 0xffff
+        word = ord(message[i]) + (ord(message[i+1]) << 8)
+        sum_words = carry_around_add(sum_words,word)
+    return ~sum_words & 0xffff
 
 def detectError():
     global ser_port
