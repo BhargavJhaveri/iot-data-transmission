@@ -17,8 +17,8 @@ data_size = 4
 
 # RPI_IP = 172
 
-TCP_IP = '10.139.69.226'
-TCP_PORT = 6014
+TCP_IP = '10.139.70.173'
+TCP_PORT = 6027
 BUFFER_SIZE = 256
 
 try:
@@ -74,7 +74,6 @@ def transmit_bin_data():
 
 # Transfer data over TCP to the Raspberry Pi.
 def transmit_data_over_tcp(data):
-    # transmission_data = create_data_packet(data)
     s.send(data)
 
     print 'Waiting for an ACK'
