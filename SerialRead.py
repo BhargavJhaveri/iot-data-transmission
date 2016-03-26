@@ -25,26 +25,42 @@ def calChecksum():
     global ser_port
     global pa_size
     global message
+    padding = 0
     sum_words = 0
     word = 0
     """ Forming bytearray of payload by removing first 3 bytes
     1 sync/size byte and 2 checksum bytes"""
-    #message = bytearray()
-    #message.extend(readByte())
     message = []
-    if pa_size == 4:
+    if pa_size % 2 == 0:
+        padding = 1
+    while pa_size > 3:
         a = readByte()
         message.append(a)
-        a = '0' 
-        message.append(a[0])
-    else:
-        while pa_size > 4:
-            a = readByte()
-            message.append(a)
-            pa_size = pa_size - 1
-    message = message.pack("%dB" % len(message), *message)
-    for i in range(0,len(message), 2):
-        word = ord(message[i]) + (ord(message[i+1]) << 8)
+        pa_size = pa_size - 1
+    
+    if padding == 1:
+        msg = message.append('0')
+        
+    print "Message is : " 
+    print message
+    msg = ""
+    i = 0
+    while i < len(message)-1:
+        temp = hex(ord(message[i])).lstrip("0x")
+        msg = msg + temp + ' '
+        i = i + 1
+    temp = hex(ord(message[i])).lstrip("0x")
+    msg = msg + temp
+
+    print "Msg is : " 
+    print msg
+    msg = msg.split()
+    msg = map(lambda x: int(x,16), msg)
+    print msg
+
+    msg = struct.pack("%dB" % len(msg), *msg)
+    for i in range(0,len(msg), 2):
+        word = ord(msg[i]) + (ord(msg[i+1]) << 8)
         sum_words = carry_around_add(sum_words,word)
     return ~sum_words & 0xffff
 
@@ -58,8 +74,13 @@ def detectError():
     checksum.extend(readByte())
     a = readByte()
     checksum.extend(a)
-   
-    if calChecksum() == checksum:
+    print " checksum is : "
+    print checksum 
+    calculated_checksum = calChecksum() 
+    print "Checksum: 0x%04x" % calculated_checksum
+    print "calculated checksum is : "
+    print calculated_checksum
+    if calculated_checksum == checksum:
         return 1
     else:
         return 0
@@ -91,8 +112,9 @@ while True:
 	    else:
                 #sendACK()
                 print "send ACK"
-                f.write(message)
-                 
+                for data in message:
+                    f.write(data)
+                f.close()
                                  
     if first_packet == 1:
         pa_size = ord(first_byte) & size_mask
