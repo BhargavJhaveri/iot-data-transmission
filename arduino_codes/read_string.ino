@@ -44,13 +44,13 @@ void loop() {
     detachInterrupt(0);
     charshift = 0;
     byte_read = 0;    
-    delay(8);
+    delay(3);
     buttonState = digitalRead(pushButton);    
     byte_read <<= 1;
     byte_read = byte_read | buttonState;
     charshift++;  
 
-    Timer1.initialize(20000);
+    Timer1.initialize(10000);
     Timer1.attachInterrupt( readbit );
     while(!Serial.available()) {
       if(charshift >=8 ){
