@@ -21,9 +21,9 @@ def string_to_bits(string_data):
 
 sleep = 1/100.0000
 
-TCP_IP = '10.139.67.91'
-TCP_PORT_PC1 = 6000
-TCP_PORT_PC2 = 6001
+TCP_IP = '10.139.70.173'
+TCP_PORT_PC1 = 6027
+TCP_PORT_PC2 = 6028
 BUFFER_SIZE = 256
 ACK = '11110000'
 NACK = '00001111'
@@ -36,6 +36,7 @@ try:
     PC1.bind((TCP_IP, TCP_PORT_PC1))
     PC1.listen(1)
     connPC1, addrPC1 = PC1.accept()
+    print "PC1 connected"
 except:
     print 'TCP CONNECTION ERR - PC1'
     e = sys.exc_info()[0]
@@ -51,6 +52,7 @@ try:
     PC2.listen(1)
     connPC2, addrPC2 = PC2.accept()
     connPC2.settimeout(20)
+    print "PC2 connected"
 except:
     print 'TCP CONNECTION ERR - PC2'
     PC1.close()
@@ -59,21 +61,21 @@ except:
 
 
 while 1: #we need to finalize the protocol
-    dataToTransmit = connPC1.recv(BUFFER_SIZE)
-    ack =  None
-    retransmit = 0
-    packetCount = 0
-    print "new packet"
-    sendPacket(dataToTransmit)
-    GPIO.output(7, 0)
-    try:
+     dataToTransmit = connPC1.recv(BUFFER_SIZE)
+     ack =  None
+     retransmit = 0
+     packetCount = 0
+     print "new packet:", dataToTransmit
+     sendPacket(dataToTransmit)
+     GPIO.output(7, 0)
+     try:
          ack = connPC2.recv(BUFFER_SIZE)
          print "received1:", ack
-    except socket.timeout:
+     except socket.timeout:
 	 retransmit = 1
 	 print 'Socket timeout'
          pass	
-    if ack == NACK or retransmit == 1:
+     if ack == NACK or retransmit == 1:
          sendPacket(dataToTransmit)
          GPIO.output(7, 0)
          try:
@@ -83,5 +85,5 @@ while 1: #we need to finalize the protocol
               retransmit = 0
               print 'Socket timeout'
               pass
-    else
-        connPC1.send("1")
+     else:
+         connPC1.send("1")
