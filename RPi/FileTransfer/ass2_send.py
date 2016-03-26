@@ -3,13 +3,8 @@ import binascii
 import struct
 import socket
 
-# import zipfile
-
-<<<<<<< HEAD
-data_file = open('/Users/bhargav/Study/Study/Sem-II/IoT/Homework/HW2/Codes/iot-data-transmission/TextFile/Hello.txt', 'rb')
-=======
-data_file = open('/Users/bhargav/Study/Study/Sem-II/IoT/Homework/HW2/TextFile/Hello.txt', 'rb')
->>>>>>> f06eed518a89ec532c1ae0d737ac5e37bf8878ff
+data_file = open('/Users/bhargav/Study/Study/Sem-II/IoT/Homework/HW2/Codes/iot-data-transmission/TextFile/Hello.txt',
+                 'rb')
 
 # Packet size of 64 bytes.
 # packet_size = 1
@@ -21,7 +16,6 @@ data_size = 4
 
 # RPI_IP = 172
 
-<<<<<<< HEAD
 TCP_IP = '10.139.70.173'
 TCP_PORT = 6027
 BUFFER_SIZE = 256
@@ -31,17 +25,17 @@ try:
     s.connect((TCP_IP, TCP_PORT))
 except:
     print 'Socket Connection could not be setup'
-=======
+
 TCP_IP = '10.139.69.226'
 TCP_PORT = 6006
 BUFFER_SIZE = 256
+
 
 # try:
 #     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 #     s.connect((TCP_IP, TCP_PORT))
 # except:
 #     print 'Socket Connection could not be setup'
->>>>>>> f06eed518a89ec532c1ae0d737ac5e37bf8878ff
 
 
 def read_in_chunks(input_file, chunk_size=1024 * 64):
@@ -90,24 +84,17 @@ def transmit_bin_data():
 
 # Transfer data over TCP to the Raspberry Pi.
 def transmit_data_over_tcp(data):
-<<<<<<< HEAD
     s.send(data)
-
     print 'Waiting for an ACK'
     ack = s.recv(BUFFER_SIZE)
-=======
-    # transmission_data = create_data_packet(data)
-    # s.send(data)
 
-    print 'Waiting for an ACK'
-    # ack = s.recv(BUFFER_SIZE)
->>>>>>> f06eed518a89ec532c1ae0d737ac5e37bf8878ff
     print 'Received an ACK'
-
     return True
 
 
 # Create data packet by adding checksum to the data bits.
+
+
 def create_data_packet(data):
     pack_size = 0
     seq = ''
