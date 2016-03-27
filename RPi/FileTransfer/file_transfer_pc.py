@@ -14,8 +14,6 @@ checksum_size = 2
 # Actual data size.
 data_size = 1
 
-# RPI_IP = 172
-
 TCP_IP = '10.139.64.106'
 TCP_PORT = 6004
 BUFFER_SIZE = 1
@@ -34,12 +32,13 @@ except:
 # except:
 #     print 'Socket Connection could not be setup'
 
-
+# Read the source file in chunks.
 def read_in_chunks(input_file, chunk_size=1024 * 64):
     chunk = input_file.read(chunk_size)
     return chunk
 
 
+# Converting String format data into bits/binary.
 def string_to_bits(string_data):
     return ''.join(bin(ord(ch))[2:].zfill(8) for ch in string_data)
 
@@ -50,6 +49,7 @@ def bits_to_string(binary_data):
     return ''.join(chr(int(binary_data[i:i + 8], 2)) for i in xrange(0, len(binary_data), 8))
 
 
+# Transmit the data.
 def transmit_bin_data():
     raw_data = 'START'
 
@@ -83,16 +83,10 @@ def transmit_bin_data():
 # Transfer data over TCP to the Raspberry Pi.
 def transmit_data_over_tcp(data):
     s.send(data)
-    # print 'Waiting for an ACK'
-    # ack = s.recv(BUFFER_SIZE)
-
-    # print 'Received an ACK'
     return True
 
 
 # Create data packet by adding checksum to the data bits.
-
-
 def create_data_packet(data):
     pack_size = 0
     seq = ''
