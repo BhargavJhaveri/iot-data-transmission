@@ -1,3 +1,7 @@
+#Team: Group 8
+#FileName: realTimeTransmissionPC1.py
+#Description: This file acts as a User Interface for PC1 during real Time transmission. Makes a TCP connection with Rasp Pi
+#PC1 acts as a dumb terminal
 import curses
 import sys
 import socket
@@ -36,6 +40,7 @@ except:
     print e
     sys.exit(1)
 
+#Get character from keyboard, display it on screen, and send it over to RaspPi
 while 1:
     c = stdscr.getch()
     if c == 127: #if backspace character seen
