@@ -24,11 +24,11 @@ def string_to_bits(string_data):
     return ''.join(bin(ord(ch))[2:].zfill(8) for ch in string_data)
 
 
-sleep = 1/200.0000
+sleep = 1/250.0000
 
-TCP_IP = '10.139.61.61'
-TCP_PORT_PC1 = 6027
-TCP_PORT_PC2 = 6028
+TCP_IP = '10.139.64.106'
+TCP_PORT_PC1 = 6000
+TCP_PORT_PC2 = 6001
 BUFFER_SIZE = 1
 
 GPIO_init()
@@ -83,7 +83,7 @@ while 1: #we need to finalize the protocol
         print "serviceTime=", serviceTime
         print "avg speed = (bps)", byteCount/serviceTime*8
         print "Erros:", errors
-	print "Error Rate:", errors/byteCount
+	print "Error Rate:", errors*1.0/byteCount
         sys.exit(1)
 
     GPIO.output(7, 0)
@@ -115,3 +115,4 @@ while 1: #we need to finalize the protocol
          print "avg speed = (bps)", byteCount/serviceTime*8
          sys.exit(1)
     '''
+
