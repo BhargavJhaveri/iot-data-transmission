@@ -20,8 +20,7 @@ TCP_IP = '10.139.64.106'
 TCP_PORT = 6004
 BUFFER_SIZE = 1
 
-
-
+# Socket Connection setup.
 try:
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((TCP_IP, TCP_PORT))
@@ -70,11 +69,11 @@ def transmit_bin_data():
         # Transmit and wait for the ACK.
         if transmit_data_over_tcp(raw_data):
             continue
-        # else:
-        #     is_transmitted = False
-        #     while retransmissions < 5 and not is_transmitted:
-        #         retransmissions += 1
-        #         is_transmitted = transmit_data_over_tcp(raw_data)
+            # else:
+            #     is_transmitted = False
+            #     while retransmissions < 5 and not is_transmitted:
+            #         retransmissions += 1
+            #         is_transmitted = transmit_data_over_tcp(raw_data)
     transmit_data_over_tcp(chr(127))
 
 
