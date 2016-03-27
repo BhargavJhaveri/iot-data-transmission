@@ -12,9 +12,7 @@ def GPIO_init():
 def sendPacket(char):
     var = 0
     charBin = string_to_bits(char)
-    '''print charBin'''
     charBin = [1, charBin[1], charBin[2], charBin[3], charBin[4], charBin[5], charBin[6], charBin[7]]
-    '''print charBin'''
     for i in range(8):
 	GPIO.output(7, int(charBin[i]))
         time.sleep(sleep)
@@ -24,11 +22,11 @@ def string_to_bits(string_data):
     return ''.join(bin(ord(ch))[2:].zfill(8) for ch in string_data)
 
 
-sleep = 1/250.0000
+sleep = 1/100.0000
 
 TCP_IP = '10.139.64.106'
-TCP_PORT_PC1 = 6000
-TCP_PORT_PC2 = 6001
+TCP_PORT_PC1 = 6004
+TCP_PORT_PC2 = 6005
 BUFFER_SIZE = 1
 
 GPIO_init()
@@ -65,6 +63,7 @@ except:
 
 timeStart = time.time()
 byteCount = 0
+retransmissionCount = 0
 errors = 0
 while 1: #we need to finalize the protocol
     dataToTransmit = connPC1.recv(BUFFER_SIZE)
@@ -72,6 +71,7 @@ while 1: #we need to finalize the protocol
     byteCount += 1
     timeoutCount = 0
     retransmit = 0
+    currentError = 0
     print "input:",dataToTransmit
     if ord(dataToTransmit) != 127:
 	sendPacket(dataToTransmit)
@@ -79,8 +79,9 @@ while 1: #we need to finalize the protocol
         sendPacket(dataToTransmit)
         timeEnd = time.time()
         serviceTime = timeEnd - timeStart
-        print "byteCount=", byteCount
-        print "serviceTime=", serviceTime
+        print "Byte Count=", byteCount
+        print "Retransmission Count =", retransmissionCount
+        print "serviceTime =", serviceTime
         print "avg speed = (bps)", byteCount/serviceTime*8
         print "Erros:", errors
 	print "Error Rate:", errors*1.0/byteCount
@@ -94,25 +95,21 @@ while 1: #we need to finalize the protocol
 	 retransmit = 1
 	 print 'Socket timeout'
          pass	
-    if ack != dataToTransmit or retransmit == 1:
-         errors += 1
+    while ack != dataToTransmit and retransmit <= 3:
+
+         retransmissionCount += 1
          sendPacket(dataToTransmit)
          GPIO.output(7, 0)
          try:
               ack = connPC2.recv(BUFFER_SIZE)
-              if ack == dataToTransmit:
-                  errors -= 1
-              print "received2:", ack
+              if ack != dataToTransmit:
+                  retransmit += 1
+              print "retransmission",retransmit
+              print "received:", ack
          except socket.timeout:
-              retransmit = 0
+              retransmit += 1
               print 'Socket timeout'
               pass
-    ''' if len(ack) != 0 and ord(ack)==127:
-         timeEnd = time.time()
-         serviceTime = timeEnd - timeStart
-         print "byteCount=", byteCount
-         print "serviceTime=", serviceTime
-         print "avg speed = (bps)", byteCount/serviceTime*8
-         sys.exit(1)
-    '''
+    if ack != dataToTransmit:
+        errors += 1
 
