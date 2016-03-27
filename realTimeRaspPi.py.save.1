@@ -9,9 +9,14 @@ def GPIO_init():
     GPIO.setup(7, GPIO.OUT)
     GPIO.output(7,0)
 
-def sendPacket(binString):
-    for i in range(len(binString)):
-	GPIO.output(7, int(binString[i]))
+def sendPacket(char):
+    var = 0
+    charBin = string_to_bits(char)
+    '''print charBin'''
+    charBin = [1, charBin[1], charBin[2], charBin[3], charBin[4], charBin[5], charBin[6], charBin[7]]
+    '''print charBin'''
+    for i in range(8):
+	GPIO.output(7, int(charBin[i]))
         time.sleep(sleep)
   #  	print int(charBin[i])
 
@@ -21,12 +26,10 @@ def string_to_bits(string_data):
 
 sleep = 1/100.0000
 
-TCP_IP = '0.0.0.0'
-TCP_PORT_PC1 = 6050
-TCP_PORT_PC2 = 6051
-BUFFER_SIZE = 256
-ACK = '11110000'
-NACK = '00001111'
+TCP_IP = '10.139.67.91'
+TCP_PORT_PC1 = 5056
+TCP_PORT_PC2 = 5057
+BUFFER_SIZE = 1
 
 GPIO_init()
 
@@ -36,7 +39,6 @@ try:
     PC1.bind((TCP_IP, TCP_PORT_PC1))
     PC1.listen(1)
     connPC1, addrPC1 = PC1.accept()
-    print "PC1 connected"
 except:
     print 'TCP CONNECTION ERR - PC1'
     e = sys.exc_info()[0]
@@ -51,41 +53,39 @@ try:
     PC2.bind((TCP_IP, TCP_PORT_PC2))
     PC2.listen(1)
     connPC2, addrPC2 = PC2.accept()
-    connPC2.settimeout(20)
-    print "PC2 connected"
-    time.sleep(1)
+    connPC2.settimeout(2)
 except:
     print 'TCP CONNECTION ERR - PC2'
     PC1.close()
     PC2.close()
     sys.exit(1)
 
-ack = connPC2.recv(BUFFER_SIZE)
-print "received0:", ack
+
 while 1: #we need to finalize the protocol
-     dataToTransmit = connPC1.recv(BUFFER_SIZE)
-     ack =  None
-     retransmit = 0
-     packetCount = 0
-     print "new packet:", dataToTransmit
-     sendPacket(dataToTransmit)
-     GPIO.output(7, 0)
-     try:
+    dataToTransmit = connPC1.recv(BUFFER_SIZE)
+    ack =  None
+    timeoutCount = 0
+    retransmit = 0
+    print "input:",dataToTransmit
+    sendPacket(dataToTransmit)
+    GPIO.output(7, 0)
+    try:
          ack = connPC2.recv(BUFFER_SIZE)
          print "received1:", ack
-     except socket.timeout:
+    except socket.timeout:
 	 retransmit = 1
 	 print 'Socket timeout'
          pass	
-     if ack == NACK or retransmit == 1:
+    if actry:
+         ack = connPC2.recv(BUFFER_SIZE)
+         print "received1:", ack
+    except socket.timeout:
+         retransmit = 1
+         print 'Socket timeout'
+         pass
+k != dataToTransmit or retransmit == 1:
          sendPacket(dataToTransmit)
          GPIO.output(7, 0)
-         try:
-              ack = connPC2.recv(BUFFER_SIZE)
-              print "received2:", ack
-         except socket.timeout:
-              retransmit = 0
-              print 'Socket timeout'
-              pass
-     else:
-         connPC1.send("1")
+         
+	 ack = connPC2.recv(BUFFER_SIZE)
+         print "received2:", ack
