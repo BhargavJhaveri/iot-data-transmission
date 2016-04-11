@@ -36,10 +36,55 @@ if __name__ == '__main__':
     while True:
         pass
 """
+f = open('out.txt','w')
+serverIP = '10.139.61.61'
+serverPort = 6020
+Buffer_size = 1
+
+clientSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+clientSocket.connect((serverIP, serverPort))
+
+
 def bits_to_string(binary_data):
-        # n = int(binary_data,2)
-        # return binascii.unhexlify('%x' % n)
-        return ''.join(chr(int(binary_data[i:i + 8], 2)) for i in xrange(0, len(binary_data), 8))
+    # n = int(binary_data,2)
+    # return binascii.unhexlify('%x' % n)
+    return ''.join(chr(int(binary_data[i:i + 8], 2)) for i in xrange(0, len(binary_data), 8))
+
+def string_to_bits(string_data):
+    return ''.join(bin(ord(ch))[2:].zfill(8) for ch in string_data)
+
+def removeParity(arr):
+    retstr = ""
+    for i in range(6):
+        retstr += '0' + arr[6*i+1] + arr[6*i+2] + arr[6*i+3] + arr[6*i+4]+ arr[6*i+5]+ arr[6*i+6] + arr[6*i+7] 
+    return bits_to_string(retstr)
+
+def calculateParity(arr):
+    for i in range(6):
+        parity = 0
+        for j in range(8):
+            parity = parity ^ arr[i*6+j]
+        if parity == 0:
+            return False
+    return True
+    
+
+def check_parity(arr):
+    #if parity ok, remove msb, write to file,send ack
+    faultFlag = False
+    for i in range(6):
+        if not calculateParity(arr):
+            faultFlag = True
+            break
+        else:
+
+    if faultFlag:
+        clientSocket.send("nack")
+    else:
+        clientSocket.send("ack")
+        f.write(removeParity(arr))
+    
+
 
 packet_size = 6*8 + 2
 arr = ""
@@ -69,5 +114,6 @@ while True:
         else :
             arr += '0'
         #print arr, len(arr)
-    print bits_to_string(arr)
+    #print bits_to_string(arr)
+    check_parity(arr)
     #print datetime.now()
