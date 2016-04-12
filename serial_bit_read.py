@@ -44,7 +44,7 @@ def bits_to_string(binary_data):
 packet_size = 6*8 + 2
 arr = ""
 ct = 0
-ser = serial.Serial('/dev/ttyACM2',115200)
+ser = serial.Serial('/dev/ttyACM3',115200)
 
 
    

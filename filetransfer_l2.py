@@ -24,11 +24,12 @@ while True:
         f.close()
         break
     if(temp > 0) :
-        time.sleep(1/200.0)
+        time.sleep(1/100.0)
         f.write(chr(temp))
         clientSocket.send(chr(temp))
     else:
         print "temp is less than zero",ord(r)
         clientSocket.send('\0')
 
+print ord(r)
 clientSocket.close()
