@@ -8,8 +8,8 @@ import os
 from Queue import Queue
 
 #f = open('out.txt','w')
-serverIP = '192.168.0.26'
-serverPort = 6038
+serverIP = '192.168.43.245'
+serverPort = 6072
 Buffer_size = 1
 
 clientSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -26,6 +26,7 @@ def removeParity(arr):
     retstr = ""
     for i in range(6):
         retstr += '0' + arr[8*i+1] + arr[8*i+2] + arr[8*i+3] + arr[8*i+4]+ arr[8*i+5]+ arr[8*i+6] + arr[8*i+7] 
+    print bits_to_string(retstr)
     return bits_to_string(retstr)
 
 def calculateParity(arr):
@@ -41,11 +42,11 @@ def calculateParity(arr):
 def check_parity(arr):
     correct_parity = calculateParity(arr)
     if correct_parity:
-        #print "Sending ACK"
+        print "Sending ACK"
         clientSocket.send("1")
         return True
     else:
-        #print "Sending NACK"
+        print "Sending NACK"
         clientSocket.send("0")
         return False
         
@@ -58,19 +59,36 @@ ser = serial.Serial('/dev/ttyACM0',115200)
 f = open('output.txt','w')
 
 def lastPacket(arr):
-    sum = 0
+    sum_of_bits = 0
+    count = 0
     for i in range(len(arr)):
-        sum = sum + int(arr[i])
-    return sum
+        count = count + 1
+        if i%8 == 0:
+            continue
+        sum_of_bits = sum_of_bits + int(arr[i])
+        if count == 8:
+            if sum_of_bits == 0:
+                print "last packet ", sum_of_bits
+       	        return sum_of_bits
+            else:
+                count = 0
+                sum_of_bits = 0
+    return 1 
 
-timestart = 0
+num_of_bits = 0
+isTimeToStart = 0
+start_time = datetime.now()
+end_time = datetime.now()
+trackLastPacket = 0
+
 while True:   
     arr = ""
     for j in range(5):
         s = ser.readline()
-        if timestart == 0:
-            print "Timestamp " ,datetime.now()
-            timestart = 1
+        if isTimeToStart == 0:
+            start_time = datetime.now()
+            print "Start time Timestamp " ,start_time
+            isTimeToStart = 1
     for i in range(packet_size):
         sumbits = 0
         for k in range(5):
@@ -85,13 +103,22 @@ while True:
             arr += '1'
         else :
             arr += '0'
-
+                
+        
+    #print arr 
     if lastPacket(arr) == 0:
         f.close()
-        print "File is transferred"
-        print "Timestamp " ,datetime.now()
+        end_time = datetime.now()
+        total_time = end_time - start_time
+        #transfer_speed = num_of_bits / total_time
+        print "File transfer is completed"
+        print "Number of bits transferred " , num_of_bits
+        print "End time Timestamp " ,end_time
+        print "Total time taken " , total_time 
+        #print "Transfer speed in bits/second ", transfer_speed
         sys.exit(1)
        
     if check_parity(arr):
+        num_of_bits = num_of_bits + len(arr)
         f.write(removeParity(arr))
    

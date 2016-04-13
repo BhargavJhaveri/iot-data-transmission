@@ -3,19 +3,19 @@ import socket
 import sys
 import time
 from datetime import datetime
-import thread
-import os
-from Queue import Queue
 
 #f = open('out.txt','w')
-serverIP = '192.168.0.26'
-serverPort = 6038
+serverIP = '192.168.43.245'
+serverPort = 6125
 Buffer_size = 1
+packet_chars = 1
 
-packer_chars = 1        
-clientSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-clientSocket.connect((serverIP, serverPort))
-
+try:        
+     clientSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+     clientSocket.connect((serverIP, serverPort))
+except:
+     print "Error in connection"
+     sys.exit(1)
 
 def bits_to_string(binary_data):
     return ''.join(chr(int(binary_data[i:i + 8], 2)) for i in xrange(0, len(binary_data), 8))
@@ -37,16 +37,15 @@ def calculateParity(arr):
         if parity == 0:
             return False
     return True
-    
 
 def check_parity(arr):
     correct_parity = calculateParity(arr)
     if correct_parity:
-        #print "Sending ACK"
+        print "Sending ACK"
         clientSocket.send("1")
         return True
     else:
-        #print "Sending NACK"
+        print "Sending NACK"
         clientSocket.send("0")
         return False
 
@@ -55,23 +54,10 @@ arr = ""
 ct = 0
 ser = serial.Serial('/dev/ttyACM0',115200)
 
-   
-#f = open('output.txt','w')
-
-def lastPacket(arr):
-    sum = 0
-    for i in range(len(arr)):
-        sum = sum + int(arr[i])
-    return sum
-
-timestart = 0
 while True:   
     arr = ""
     for j in range(5):
         s = ser.readline()
-        #if timestart == 0:
-        #    print "Timestamp " ,datetime.now()
-        #    timestart = 1
     for i in range(packet_size):
         sumbits = 0
         for k in range(5):
@@ -87,13 +73,5 @@ while True:
         else :
             arr += '0'
 
-    #if lastPacket(arr) == 0:
-        #f.close()
-        #print "File is transferred"
-        #print "Timestamp " ,datetime.now()
-        #sys.exit(1)
-       
-    if check_parity(arr):
-        print removeParity(arr),
-        #f.write(removeParity(arr))
-   
+    if check_parity(arr) == 1:
+    	print "Transferred character : ", removeParity(arr)
