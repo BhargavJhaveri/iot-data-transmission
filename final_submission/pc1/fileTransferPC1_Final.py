@@ -11,7 +11,7 @@ except:
 
 
 TCP_IP_RaspPi = '192.168.43.245'
-TCP_PORT_RaspPi = 6047
+TCP_PORT_RaspPi = 6065
 BUFFER_SIZE = 8192
 
 # Socket Connection setup.
@@ -21,21 +21,20 @@ try:
 except:
     print 'Socket Connection could not be setup'
 
-
 # Read the source file in chunks.
 def read_in_chunks(input_file, chunk_size=BUFFER_SIZE):
     chunk = input_file.read(chunk_size)
     return chunk
 
-
 # Transmit the data.
 def transmit_bin_data():
     raw_data = 'START'
-
+    data_size = BUFFER_SIZE
     while raw_data:
 
         # Read data in chunks. The data which is actually read is of the size, lesser than the packet size.
         raw_data = read_in_chunks(data_file, data_size)
+        print "raw data " , raw_data
         if len(raw_data) == 0:
             break;
 
@@ -46,14 +45,10 @@ def transmit_bin_data():
     print "File Sent"
 
 
-# def setup_connection():
-
-
 # Transfer data over TCP to the Raspberry Pi.
 def transmit_data_over_tcp(data):
     s.send(data)
     return True
 
-
-
+transmit_bin_data()
 
